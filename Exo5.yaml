@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Product & Order API
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com
+
+tags:
+  - name: Products
+    description: Gestion des produits
+  - name: Orders
+    description: Gestion des commandes
+
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Récupérer la liste des produits
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/q'
+      responses:
+        '200':
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                multipleProducts:
+                  summary: Exemple avec plusieurs produits
+                  value:
+                    - name: "Pomme"
+                      expiration_datetime: "2025-09-01T12:00:00Z"
+                      price: 1.50
+                    - name: "Banane"
+                      expiration_datetime: "2025-09-05T18:00:00Z"
+                      price: 2.00
+                emptyList:
+                  summary: Exemple avec une liste vide
+                  value: []
+
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Liste paginée des commandes
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Liste des commandes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                multipleOrders:
+                  summary: Exemple avec plusieurs commandes
+                  value:
+                    - identifier: 1
+                      customer_name: "Alice"
+                      creation_datetime: "2025-08-25T14:00:00Z"
+                      total_amount: 35.90
+                    - identifier: 2
+                      customer_name: "Bob"
+                      creation_datetime: "2025-08-26T09:30:00Z"
+                      total_amount: 20.50
+
+    post:
+      tags:
+        - Orders
+      summary: Créer une nouvelle commande
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+            examples:
+              createOrderExample:
+                summary: Exemple de création de commande
+                value:
+                  identifier: 3
+                  customer_name: "Charlie"
+                  creation_datetime: "2025-08-27T10:15:00Z"
+                  total_amount: 50.75
+      responses:
+        '201':
+          description: Commande créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                createdOrder:
+                  summary: Exemple de réponse après création
+                  value:
+                    identifier: 3
+                    customer_name: "Charlie"
+                    creation_datetime: "2025-08-27T10:15:00Z"
+                    total_amount: 50.75
+        '401':
+          description: Authentification requise
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+        expiration_datetime:
+          type: string
+          format: date-time
+        price:
+          type: number
+          format: float
+
+    Order:
+      type: object
+      properties:
+        identifier:
+          type: integer
+        customer_name:
+          type: string
+        creation_datetime:
+          type: string
+          format: date-time
+        total_amount:
+          type: number
+          format: float
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: Nombre maximum de produits
+      required: false
+      schema:
+        type: integer
+        example: 10
+    q:
+      name: q
+      in: query
+      description: Terme de recherche
+      required: false
+      schema:
+        type: string
+        example: pomme
+    page:
+      name: page
+      in: query
+      description: Numéro de la page
+      required: false
+      schema:
+        type: integer
+        example: 1
+    size:
+      name: size
+      in: query
+      description: Taille de la page
+      required: false
+      schema:
+        type: integer
+        example: 20
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
