@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: API de gestion de tâche
+  version: 1.0.0
+
+paths:
+  /tasks:
+    get:
+      summary: Retourne une liste de task[].
+      responses:
+        '200':
+          description: Liste des tasks qu'un id dois faire
+          content:
+            application/json:
+              schema:
+                type: array
+                items:                  
+                  $ref: "#/components/schemas/Task"
+    post:
+      summary: créer de nouveau tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:                  
+                $ref: "#/components/schemas/Task"
+      responses:
+        '201':
+          description: Liste des tasks qui ont étés créé
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schema/"
+
+
+
+
+

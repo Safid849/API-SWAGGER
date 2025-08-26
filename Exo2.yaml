@@ -1,60 +1,127 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: API Utilisateurs
+  title: Task Management API
   version: 1.0.0
-  description: API simple pour gérer les utilisateurs.
+
 paths:
-  /users:
+  /tasks:
     get:
-      summary: Récupère une liste d’utilisateurs
-      description: Retourne une liste paginée d’utilisateurs.
-      parameters:
-        - name: page
-          in: query
-          description: Numéro de la page à récupérer
-          required: false
-          schema:
-            type: integer
-            example: 1
-        - name: size
-          in: query
-          description: Nombre d’utilisateurs par page
-          required: false
-          schema:
-            type: integer
-            example: 20
+      summary: Get all tasks
       responses:
-        '200':
-          description: Liste des utilisateurs retrouvés
+        "200":
+          description: List of tasks
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
-        '400':
-          description: Mauvais types de paramètres fournis
+                  $ref: "#/components/schemas/Task"
+
+    post:
+      summary: Create new tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Task"
+      responses:
+        "201":
+          description: List of created tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+
+    delete:
+      summary: Delete multiple tasks by IDs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+              example: [1, 2, 3]
+      responses:
+        "200":
+          description: List of deleted tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+
+  /tasks/{id}:
+    get:
+      summary: Get task by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A single task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Task not found
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
-                    example: Bad types for provided query parameters
+                    example: "Task not found"
+
+    delete:
+      summary: Delete task by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task not found"
 
 components:
   schemas:
-    User:
+    Task:
       type: object
       properties:
         id:
           type: integer
           example: 1
-        name:
+        title:
           type: string
-          example: Alice
-        email:
-          type: string
-          format: email
-          example: alice@example.com
+          example: "Faire les devoires"
+        completed:
+          type: boolean
+          example: false
